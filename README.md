@@ -6,6 +6,9 @@ A .NET-based e-commerce API with JWT (JSON Web Token) authentication.
 
 This project is a RESTful API built with ASP.NET Core that implements JWT-based authentication for secure e-commerce transactions. It provides endpoints for product management, orders, and user authentication.
 
+[URL del repositorio del proyecto](https://github.com/c-maradiaga/JWTECommerce)
+[URL del repositorio del Curso](https://github.com/DevTalles-corp/cs-apiEcommerce/tree/fin-seccion-3)
+
 ## Requirements
 
 - .NET 10.0 or later
@@ -77,6 +80,34 @@ This API uses JWT tokens for authentication. Include the token in the `Authoriza
 ```
 Authorization: Bearer <your-jwt-token>
 ```
+
+
+## Creando imagen y contenedor para SQL SERVER
+
+Se utilizó docker para crear un contenedor, usando el archivo docker-compose.
+
+
+## Creación de Categoria
+
+[DataAnnotation documentación](https://learn.microsoft.com/es-mx/ef/core/modeling/entity-properties?tabs=data-annotations%2Cwith-nrt#primary-key)
+
+### Configuración de la conexión con la base de datos SQL Server.
+
+### Instalación de paquetes necesarios para trabajar con EF Core
+
+### Creación del archivo de contexto (DbContext).
+
+### Configuración de la cadena de conexión en el proyecto en Program.cs.
+
+### Ejecución de la primera migración y actualización de la base de datos
+
+dotnet tool install --global dotnet-ef --version 10
+dotnet add package Microsoft.EntityFrameworkCore.Design
+
+dotnet-ef migrations add Migracion-Inicial
+
+
+
 
 ## License
 

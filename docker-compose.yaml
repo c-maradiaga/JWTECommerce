@@ -1,0 +1,30 @@
+services:
+  sqlserver2022:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver2022
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'Password123'
+      MSSQL_PID: 'Developer'
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+volumes:
+  sqlserver_data:
+
+    #? Recordar tener Docker instalado y en ejecución para usar este archivo docker-compose.yaml.
+
+    #* Comandos útiles:
+    # Levantar los contenedores en segundo plano:
+    #*   docker-compose up -d
+    # Apagar y eliminar contenedores (no borra los volúmenes):
+    #*   docker-compose down
+    # detener un contenedor específico:
+    #*   docker stop sqlserver2022
+    # eliminar un contenedor específico:
+    #*   docker rm sqlserver2022
+
+
+
