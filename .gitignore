@@ -1,0 +1,67 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleasePublic/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# NuGet artifacts
+/packages/
+/.nuget/packages/
+
+# Entity Framework
+*.db
+*.db-shm
+*.db-wal
+
+# Local Environment
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# Linux
+.directory
+
+# Rider
+.idea/
+*.sln.iml
+
+# JetBrains
+*.sln.iml
+
+# Misc
+*.swp
+*.swo
+*~
+.vscode-test/
