@@ -105,6 +105,27 @@ dotnet tool install --global dotnet-ef --version 10
 dotnet add package Microsoft.EntityFrameworkCore.Design
 
 dotnet-ef migrations add Migracion-Inicial
+dotnet-ef database update
+
+## API Categoria
+
+DTO:
+*  Ocultar determinadas propiedad qeu los clientes no deben ver
+*  Omitir propiedades para reducir el tamaño de la carga.
+*  Desacoplar la capa de servicio del nivel de base de datos
+*  Tener diferetnes DTOs apra cada version de la API.
+
+* AutoMapper:
+Convertir de Category a CategoryDto y de Category a CreateCategoryDto.
+Se usa la version de automapper 14.0.0. ya que a partir de la v15, se necesita una licencia
+y la declaracion en Program.cs cambia
+
+## Configurando Docker-Compose aislado de otros proyectos 
+Con esto podríamos tener varios proyectos corriendo simultáneamente, cada uno con su propia
+instancia de SQL Server
+
+
+
 
 
 

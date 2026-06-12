@@ -4,17 +4,18 @@ services:
     container_name: sqlserver2022
     environment:
       ACCEPT_EULA: 'Y'
-      MSSQL_SA_PASSWORD: 'Password123'
+      MSSQL_SA_PASSWORD: 'Pass123**'
       MSSQL_PID: 'Developer'
     ports:
-      - "1433:1433"
+      - "1434:1433"
     volumes:
-      - sqlserver_data:/var/opt/mssql
+      - jwt_ecommerce:/var/opt/mssql
 
 volumes:
-  sqlserver_data:
+  jwt_ecommerce:
 
     #? Recordar tener Docker instalado y en ejecución para usar este archivo docker-compose.yaml.
+    #? en el apartdo ports: 1434:1433, el puerto 1434 es el puerto del host (nuestro equipo) y el puerto 1433 es el puerto del contenedor (sqlserver2022). Esto significa que cuando accedamos a localhost:1434 en nuestro equipo, estaremos accediendo al puerto 1433 dentro del contenedor, donde se está ejecutando SQL Server.
 
     #* Comandos útiles:
     # Levantar los contenedores en segundo plano:

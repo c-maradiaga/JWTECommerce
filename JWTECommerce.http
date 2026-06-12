@@ -1,6 +1,6 @@
 @JWTECommerce_HostAddress = http://localhost:5062
 
-GET {{JWTECommerce_HostAddress}}/weatherforecast/
+GET {{JWTECommerce_HostAddress}}/Categories
 Accept: application/json
 
 ###
