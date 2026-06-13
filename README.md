@@ -124,7 +124,13 @@ y la declaracion en Program.cs cambia
 Con esto podríamos tener varios proyectos corriendo simultáneamente, cada uno con su propia
 instancia de SQL Server
 
+## Para mostrar la ventana de Scalar (en lugar de swagger)
 
+http://localhost:5062/scalar/v1#tag/categories
+
+## Para usar Swagger 
+
+http://localhost:5062/swagger/index.html
 
 
 
