@@ -1,4 +1,5 @@
 using AutoMapper;
+using JWTECommerce.Models;
 using JWTECommerce.Models.Dtos;
 using JWTECommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,42 @@ public class CategoriesController : ControllerBase
         var categoryDto = _mapper.Map<CategoryDto>(category);
         return Ok(categoryDto);
     }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] 
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public IActionResult CreateCategory([FromBody] CreateCategoryDto createCategoryDto)
+    {
+        if(createCategoryDto == null)
+            return BadRequest(ModelState);
+
+        if(_categoryRepository.CategoryExists(createCategoryDto.Name))
+        {
+            ModelState.AddModelError("CustomError","La categoría Ya existe");
+            return BadRequest(ModelState);
+        }
+            
+        var category = _mapper.Map<Category>(createCategoryDto);
+
+        if(!_categoryRepository.CreateCategory(category))
+        {
+            ModelState.AddModelError("CustomError", $"Algo salió mal al guadar la categoria {category.Name}");
+            return StatusCode(500, ModelState);
+        }
+
+        return CreatedAtRoute("GetCategory", new {id = category.Id}, category);
+
+    }
+
+
+
+
+
+
+
 
 
 

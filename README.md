@@ -130,7 +130,8 @@ http://localhost:5062/scalar/v1#tag/categories
 
 ## Para usar Swagger 
 
-http://localhost:5062/swagger/index.html
+https://localhost:7185/swagger/index.html
+
 
 
 
