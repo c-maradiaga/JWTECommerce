@@ -135,6 +135,27 @@ https://localhost:7185/swagger/index.html
 
 [Documentacion sobre relaciones](https://learn.microsoft.com/es-mx/ef/core/modeling/relationships)
 
+## Usando Collection Expression y el operador de Propagacion (Spread):
+```
+public ICollection<Product> GetProducts()
+    {
+        //return _db.Products.OrderBy(p => p.Name).ToList() ;
+        return [.. _db.Products.OrderBy(p => p.Name)];
+    }
+```
+Por qué funciona sin el .ToList():
+
+[]: Los corchetes indican al compilador que estás creando una nueva colección vacía.
+
+..: Este operador toma el resultado de _db.Products.OrderBy(...) (que en este punto es un IEnumerable evaluado de Entity Framework) y "desempaqueta" o esparce sus elementos individualmente dentro de la nueva colección.
+
+Inferencia de tipos (Target typing) 🧠: Esta es la clave de tu pregunta. Como la firma de tu método declara explícitamente que devuelve un ICollection<Product>, el compilador de C# sabe exactamente qué necesita entregar. Al ver los corchetes [], genera automáticamente en segundo plano la estructura de datos más óptima (generalmente un List<Product>) que cumpla con la interfaz ICollection, evitándote escribir el .ToList() de forma explícita.
+
+
+[Documentación sobre Inyeccion de Dependencias](https://learn.microsoft.com/es-mx/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-9.0&preserve-view=true)
+
+[Documentacion sobre Carga Anticipada](https://learn.microsoft.com/es-mx/ef/core/querying/related-data/eager)
+
 
 
 
