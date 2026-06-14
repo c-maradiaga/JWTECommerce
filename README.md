@@ -133,6 +133,7 @@ http://localhost:5062/scalar/v1#tag/categories
 https://localhost:7185/swagger/index.html
 
 
+[Documentacion sobre relaciones](https://learn.microsoft.com/es-mx/ef/core/modeling/relationships)
 
 
 
