@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using JWTECommerce.Models;
 using JWTECommerce.Models.Dtos;
@@ -42,24 +38,24 @@ public class ProductController : ControllerBase
         return Ok(productsDto);
     }
 
-   [HttpGet("{productId:int}", Name = "GetProduct")]
-   [ProducesResponseType(StatusCodes.Status400BadRequest)]
-   [ProducesResponseType(StatusCodes.Status403Forbidden)]
-   [ProducesResponseType(StatusCodes.Status404NotFound)]
-   [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-   [ProducesResponseType(StatusCodes.Status200OK)]
-   public IActionResult GetProduct(int productId)
-   {
-        if(productId <= 0)
+    [HttpGet("{productId:int}", Name = "GetProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetProduct(int productId)
+    {
+        if (productId <= 0)
             return BadRequest($"Product Id = {productId} no se permite.");
 
         var product = _productRepository.GetProduct(productId);
         if (product == null)
             return NotFound($"El producto con el id {productId} No Existe");
-        
+
         var productoDto = _mapper.Map<ProductDto>(product);
         return Ok(productoDto);
-   }
+    }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -68,24 +64,24 @@ public class ProductController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public IActionResult CreateProduct([FromBody] CreateProductDto createProductDto)
     {
-        if(createProductDto == null)
+        if (createProductDto == null)
             return BadRequest(ModelState);
 
         // Validar la categoria si es valida:
-        if(!_categoryRepository.CategoryExists(createProductDto.CategoryId))
+        if (!_categoryRepository.CategoryExists(createProductDto.CategoryId))
         {
             ModelState.AddModelError("CustomError", $"El id de Categoria recibido {createProductDto.CategoryId} No Existe");
             return BadRequest(ModelState);
         }
 
-        if(_productRepository.ProductExists(createProductDto.Name))
+        if (_productRepository.ProductExists(createProductDto.Name))
         {
             ModelState.AddModelError("CustomError", $"La Producto con nombre {createProductDto.Name} Ya Existe");
             return BadRequest(ModelState);
         }
-        
+
         var product = _mapper.Map<Product>(createProductDto);
-        if(!_productRepository.CreateProduct(product))
+        if (!_productRepository.CreateProduct(product))
         {
             ModelState.AddModelError("CustomError", $"Algo salio mal al crear el producto {createProductDto.Name}");
             return StatusCode(500, ModelState);
@@ -97,7 +93,7 @@ public class ProductController : ControllerBase
         var createdProduct = _productRepository.GetProduct(product.Id);
         var productoDto = _mapper.Map<ProductDto>(createdProduct);
 
-        return CreatedAtRoute("GetProduct", new {productId = product.Id}, productoDto);
+        return CreatedAtRoute("GetProduct", new { productId = product.Id }, productoDto);
     }
 
 
