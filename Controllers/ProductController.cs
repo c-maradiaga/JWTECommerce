@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using AutoMapper;
 using JWTECommerce.Models;
 using JWTECommerce.Models.Dtos;
@@ -38,6 +39,7 @@ public class ProductController : ControllerBase
         return Ok(productsDto);
     }
 
+    // Obtener por Product Id
     [HttpGet("{productId:int}", Name = "GetProduct")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -56,6 +58,45 @@ public class ProductController : ControllerBase
         var productoDto = _mapper.Map<ProductDto>(product);
         return Ok(productoDto);
     }
+
+    // Obtener Producto por Category Id:
+    [HttpGet("searchByCategoryId/{categoryId:int}", Name = "GetProductsByCategoryId")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetProductsByCategoryId(int categoryId)
+    {
+        var lstProducts = _productRepository.GetProductForCategory(categoryId);
+        if (lstProducts.Count == 0)
+            return NotFound($"No existen productos con la categoria {categoryId}");
+
+        var lstProductDto = _mapper.Map<List<ProductDto>>(lstProducts);
+
+        return Ok(lstProductDto);
+    }
+
+
+    // Bucar Producto por Nombre o Descripcion del Producto: el {name:string} No lleva el tipo, solo los tipo int se les puede poner el tipo.
+    [HttpGet("searchProductByNameDesription/{nasearchTermme}", Name = "SearchProducts")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetProductForCategory(string searchTerm)
+    {
+        var lstProducts = _productRepository.SearchProduct(searchTerm);
+        if (lstProducts.Count == 0)
+            return NotFound($"No existen productos con el nombre o descripción {searchTerm}");
+
+        var lstProductsDto = _mapper.Map<List<ProductDto>>(lstProducts);
+        return Ok(lstProductsDto);
+    }
+
+
+
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

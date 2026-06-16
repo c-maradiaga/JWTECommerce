@@ -172,7 +172,15 @@ docker cp sqlserver2022:/var/opt/mssql/data/JWTECommerce.bak c:\Respaldos
 La ubicación del respaldo dentro del contenedor es /var/opt/mssql/data/JWTECommerce.bak
 (El directorio de destino debe existir previamente en la máquina física)
 
+```
+En Visual Studio Code, esta característica se conoce como Code Folding (Plegado de código) 📂. Las flechas en el margen izquierdo aparecen al pasar el cursor por encima, pero puedes controlar el estado de todos los métodos usando combinaciones de teclas ⌨️:
 
+Colapsar todos los métodos (Fold All): Presiona Ctrl + K y luego Ctrl + 0 (el número cero) en Windows/Linux, o Cmd + K y luego Cmd + 0 en Mac. Esto dejará todo tu archivo estructurado como en la captura.
+
+Expandir todos los métodos (Unfold All): Presiona Ctrl + K y luego Ctrl + J en Windows/Linux, o Cmd + K y luego Cmd + J en Mac.
+
+Colapsar o expandir solo el bloque actual: Presiona Ctrl + Shift + [ para cerrar el bloque donde está tu cursor, o Ctrl + Shift + ] para volverlo a abrir.
+```
 
 
 

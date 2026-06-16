@@ -20,11 +20,11 @@ public class ProductRepository : IProductRepository
 
     public bool BuyProduct(string name, int quantity)
     {
-        if(string.IsNullOrWhiteSpace(name) || quantity <= 0)
+        if (string.IsNullOrWhiteSpace(name) || quantity <= 0)
             return false;
 
         var product = _db.Products.FirstOrDefault(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
-        if(product == null || product.Stock < quantity)
+        if (product == null || product.Stock < quantity)
             return false;
 
         product.Stock -= quantity;
@@ -33,7 +33,7 @@ public class ProductRepository : IProductRepository
 
     public bool CreateProduct(Product createProduct)
     {
-        if(createProduct == null)
+        if (createProduct == null)
             return false;
 
         createProduct.CreationDate = DateTime.Now;
@@ -45,18 +45,18 @@ public class ProductRepository : IProductRepository
 
     public bool DeleteProduct(Product deleteProduct)
     {
-        if(deleteProduct == null)
+        if (deleteProduct == null)
             return false;
-        
+
         _db.Products.Remove(deleteProduct);
         return Save();
     }
 
     public Product? GetProduct(int id)
     {
-        if(id <= 0)
+        if (id <= 0)
             return null;
-            
+
         return _db.Products
         .Include(c => c.Category)
         .FirstOrDefault(p => p.Id == id);
@@ -64,10 +64,12 @@ public class ProductRepository : IProductRepository
 
     public ICollection<Product> GetProductForCategory(int categoryId)
     {
-        if(categoryId <= 0)
+        if (categoryId <= 0)
             return new List<Product>();
         // return _db.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
-        return [.. _db.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name)];
+        return [.. _db.Products
+                      .Include(p => p.Category)
+                      .Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name)];
     }
 
     public ICollection<Product> GetProducts()
@@ -76,49 +78,57 @@ public class ProductRepository : IProductRepository
         return [.. _db.Products
                 .Include(c => c.Category)
                 .OrderBy(p => p.Name)];
-        
+
         // Forma tradicional :
         // return _db.Products
         //         .Include(c => c.Category)
         //         .OrderBy(p => p.Name).ToList() ;
-        
+
     }
 
     public bool ProductExists(int id)
     {
-        if(id <= 0)
+        if (id <= 0)
             return false;
-        
+
         return _db.Products.Any(c => c.Id == id);
     }
 
     public bool ProductExists(string name)
     {
-        if(string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name))
             return false;
-        
+
         return _db.Products.Any(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
     }
 
     public bool Save()
     {
-        return _db.SaveChanges() > 0 ? true: false;
+        return _db.SaveChanges() > 0 ? true : false;
     }
 
-    public ICollection<Product> SearchProduct(string name)
+    public ICollection<Product> SearchProduct(string searchTerm)
     {
         IQueryable<Product> query = _db.Products;
-        if(!string.IsNullOrWhiteSpace(name))
-            query = query.Where(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
-        
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query.Include(p => p.Category).Where
+                                    (
+                                      p => p.Name.ToLower().Trim().Contains(searchTerm.ToLower().Trim()) ||
+                                      p.Descripcion.ToLower().Trim().Contains(searchTerm.ToLower().Trim())
+                                     );
+
         return query.OrderBy(p => p.Name).ToList();
+
+        // if (!string.IsNullOrWhiteSpace(searchTerm))
+        //     query = query.Where(p => p.Name.ToLower().Trim() == searchTerm.ToLower().Trim());
     }
 
     public bool UpdateProduct(Product updateProduct)
     {
-        if(updateProduct == null)
+        if (updateProduct == null)
             return false;
-        
+
         updateProduct.UpdateDate = DateTime.Now;
         _db.Products.Update(updateProduct);
         return Save();
