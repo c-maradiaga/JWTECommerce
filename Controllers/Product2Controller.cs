@@ -15,7 +15,7 @@ public class Product2Controller(IProductRepository productRepository, ICategoryR
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ProductDto>))]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IActionResult GetProducts()
+    public IActionResult GetProducts2()
     {
         var products = productRepository.GetProducts();
         var productsDto = mapper.Map<List<ProductDto>>(products);
@@ -23,7 +23,7 @@ public class Product2Controller(IProductRepository productRepository, ICategoryR
         return Ok(productsDto);
     }
 
-    [HttpGet("{productId:int}", Name = "GetProduct")]
+    [HttpGet("{productId:int}", Name = "GetProduct2")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -104,7 +104,7 @@ public class Product2Controller(IProductRepository productRepository, ICategoryR
         return CreatedAtRoute("GetProduct", new { productId = product.Id }, productoDto);
     }
 
-    [HttpPatch("buyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
+    [HttpPatch("buyProduct/{name}/{quantity:int}", Name = "BuyProduct2")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -142,7 +142,7 @@ public class Product2Controller(IProductRepository productRepository, ICategoryR
         return Ok($"Se compró exitosamente {quantity} {units} del producto {name}.");
     }
 
-    [HttpPut("{productId:int}", Name = "UpdateProduct")]
+    [HttpPut("{productId:int}", Name = "UpdateProduct2")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

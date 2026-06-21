@@ -52,6 +52,12 @@ public class ProductRepository : IProductRepository
         return Save();
     }
 
+    // bool DeleteProduct(Product deleteProduct);
+    public bool DeleteProduct()
+    {
+        throw new NotImplementedException();
+    }
+
     public Product? GetProduct(int id)
     {
         if (id <= 0)

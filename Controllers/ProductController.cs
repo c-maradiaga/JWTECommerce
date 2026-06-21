@@ -154,4 +154,40 @@ public class ProductController : ControllerBase
         }
         return NoContent();
     }
+
+    [HttpDelete("{productId:int}", Name = "DeleteProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult DeleteProduct(int productId)
+    {
+        if(productId == 0)
+            return BadRequest(ModelState);
+
+        var product = _productRepository.GetProduct(productId);
+        if(product is null)
+            return NotFound($"El producto con id {productId} No Existe");
+
+        if(_productRepository.DeleteProduct(product))
+        {
+            ModelState.AddModelError("CustomError", $"Algo salio mal al eliminar el producto.");
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
