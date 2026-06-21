@@ -8,6 +8,7 @@ services:
       MSSQL_PID: 'Developer'
     ports:
       - "1434:1433"
+
     volumes:
       - jwt_ecommerce:/var/opt/mssql
 

@@ -45,10 +45,10 @@ if (app.Environment.IsDevelopment())
 
 
 // Solo redirige a HTTPS si NO estamos en desarrollo
-// if (!app.Environment.IsDevelopment())
-// {
-//     app.UseHttpsRedirection();
-// }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

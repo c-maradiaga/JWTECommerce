@@ -130,7 +130,8 @@ http://localhost:5062/scalar/v1#tag/categories
 
 ## Para usar Swagger 
 
-https://localhost:7185/swagger/index.html
+https://localhost:7185/swagger/index.html ó
+http://localhost:5062/swagger/index.html  (el que funcione.)
 
 
 [Documentacion sobre relaciones](https://learn.microsoft.com/es-mx/ef/core/modeling/relationships)
@@ -156,6 +157,30 @@ Inferencia de tipos (Target typing) 🧠: Esta es la clave de tu pregunta. Como 
 
 [Documentacion sobre Carga Anticipada](https://learn.microsoft.com/es-mx/ef/core/querying/related-data/eager)
 
+## Realizando el Backup de la Base de Datos:
+Estando en una ventana de Powershell
+```
+docker exec -it sqlserver2022 /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Pass123**" -C -Q "BACKUP DATABASE [JWTECommerce] TO DISK = '/var/opt/mssql/data/JWTECommerce.bak'"
+```
+
+Con el comando docker cp se pueden transferir archivos entre el contenedor y la máquina física directamente desde la terminal
+```
+docker cp <nombre_del_contenedor>:<ruta_del_archivo_en_contenedor> <ruta_destino_en_tu_pc>
+
+docker cp sqlserver2022:/var/opt/mssql/data/JWTECommerce.bak c:\Respaldos
+```
+La ubicación del respaldo dentro del contenedor es /var/opt/mssql/data/JWTECommerce.bak
+(El directorio de destino debe existir previamente en la máquina física)
+
+```
+En Visual Studio Code, esta característica se conoce como Code Folding (Plegado de código) 📂. Las flechas en el margen izquierdo aparecen al pasar el cursor por encima, pero puedes controlar el estado de todos los métodos usando combinaciones de teclas ⌨️:
+
+Colapsar todos los métodos (Fold All): Presiona Ctrl + K y luego Ctrl + 0 (el número cero) en Windows/Linux, o Cmd + K y luego Cmd + 0 en Mac. Esto dejará todo tu archivo estructurado como en la captura.
+
+Expandir todos los métodos (Unfold All): Presiona Ctrl + K y luego Ctrl + J en Windows/Linux, o Cmd + K y luego Cmd + J en Mac.
+
+Colapsar o expandir solo el bloque actual: Presiona Ctrl + Shift + [ para cerrar el bloque donde está tu cursor, o Ctrl + Shift + ] para volverlo a abrir.
+```
 
 
 
