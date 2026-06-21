@@ -178,16 +178,4 @@ public class ProductController : ControllerBase
 
         return NoContent();
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
