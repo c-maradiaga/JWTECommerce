@@ -120,7 +120,7 @@ Convertir de Category a CategoryDto y de Category a CreateCategoryDto.
 Se usa la version de automapper 14.0.0. ya que a partir de la v15, se necesita una licencia
 y la declaracion en Program.cs cambia
 
-## Configurando Docker-Compose aislado de otros proyectos 
+## Configurando Docker-Compose aislado de otros proyectos dir
 Con esto podríamos tener varios proyectos corriendo simultáneamente, cada uno con su propia
 instancia de SQL Server
 
