@@ -135,6 +135,7 @@ public class ProductController : ControllerBase
         var productoDto = _mapper.Map<ProductDto>(createdProduct);
 
         return CreatedAtRoute("GetProduct", new { productId = product.Id }, productoDto);
+<<<<<<< HEAD
     }
 
     /* Comprar articulo: El Patch es solo porque este verbo se asemeja mas a la accion que se va a hacer,
@@ -194,6 +195,8 @@ public class ProductController : ControllerBase
             return StatusCode(500, ModelState);
         }
         return NoContent();
+=======
+>>>>>>> f4bf33224c7c1302834cdabf121990b0e7bb0dbd
     }
 
 
