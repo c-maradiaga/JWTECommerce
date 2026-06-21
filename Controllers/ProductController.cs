@@ -100,6 +100,87 @@ public class ProductController : ControllerBase
         return CreatedAtRoute("GetProduct", new {productId = product.Id}, productoDto);
     }
 
+    /* Comprar articulo: El Patch es solo porque este verbo se asemeja mas a la accion que se va a hacer,
+       pudo ser un Post. Un Get No porque no estamos obteniendo nada.*/
+    [HttpPatch("buyProduct/{name}/{quantity:int}", Name ="BuyProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult BuyProduct(string name, int quantity)
+    {
+        if(string.IsNullOrEmpty(name) || quantity <= 0)
+            return BadRequest("El nombre del producto o cantidad no son validos");
+
+        if(!_productRepository.ProductExists(name))
+            return BadRequest($"El producto {name} no existe.");
+
+        if(!_productRepository.BuyProduct(name, quantity))
+        {
+            ModelState.AddModelError("CustomError", $"No se pudo comprar el producto o la cantidad es mayor a la existencia.");
+            return BadRequest(ModelState);
+        }
+        var units = quantity == 1 ? "unidad" : "unidades";
+        return Ok($"Se compro {quantity} {units} del producto {name}");
+    }
+
+    [HttpPut("{productId:int}", Name = "UpdateProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult UpateProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+    {
+        if(updateProductDto == null)
+            return BadRequest(ModelState);
+
+        if(!_productRepository.ProductExists(productId))
+        {
+            return Problem(detail:"El producto No Existe", statusCode:StatusCodes.Status404NotFound, title:"Producto No Existe");
+            // ModelState.AddModelError("CustomError", "El producto no existe");
+            // return BadRequest(ModelState);
+        }
+
+        if(!_categoryRepository.CategoryExists(updateProductDto.CategoryId))
+        {
+            ModelState.AddModelError("CustomError", $"La categoria {updateProductDto.CategoryId} No existe");
+            return BadRequest(ModelState);
+        }
+
+        var product = _mapper.Map<Product>(updateProductDto);
+        product.Id = productId;
+
+        if(!_productRepository.UpdateProduct(product))
+        {
+            ModelState.AddModelError("CustomError", "Algo salio mal al actualizar el producto");
+            return StatusCode(500, ModelState);
+        }
+        return NoContent();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
