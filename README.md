@@ -212,9 +212,68 @@ Estructura de un JWT:
    *  Signature (Firma digital a partir del header, payload y una clave secreta)
 
 
+Analizaremos el proceso dividiéndolo en sus dos grandes fases: **Validación de Credenciales** y **Generación del JWT**.
+---
+
+## 🛠️ Fase 1: Validación de Credenciales
+
+En los primeros tres bloques del código, el sistema actúa como un filtro de seguridad para asegurarse de que el usuario es quien dice ser antes de entregarle una "llave" (el token).
+
+* **1. Validación Inicial 🛑:** Comprueba que el `Username` no viaje vacío o con espacios en blanco usando `string.IsNullOrWhiteSpace`. Si falla, corta el flujo inmediatamente devolviendo un DTO con el mensaje de error.
+* **2. Búsqueda en Base de Datos 🔍:** Busca al usuario utilizando Entity Framework (`_db.Users.FirstOrDefaultAsync`). Nota cómo usa `.ToLower().Trim()` en ambos lados para evitar problemas con mayúsculas o espacios accidentales. Si no existe, frena el proceso.
+* **3. Verificación de la Contraseña 🔐:** Las contraseñas nunca deben guardarse en texto plano. Aquí se usa la librería **BCrypt** (`BCrypt.Verify`) para comparar la contraseña que envía el cliente con el hash seguro que está guardado en la base de datos. Si no coinciden, se rechaza el acceso.
+
+---
+
+## 🎟️ Fase 2: Creación del JWT (JSON Web Token)
+
+Una vez que sabemos que el usuario es válido, el código prepara y firma el token digital.
+
+* **4. Configuración del Token 📝:** Aquí se define la estructura del token usando un `SecurityTokenDescriptor`:
+* **Claims (Demandas) 👤:** Son los datos de identidad que viajarán *dentro* del token (ID, nombre de usuario y su rol).
+* **Expiración ⏳:** Se define que el token será válido solo durante las próximas 2 horas (`DateTime.UtcNow.AddHours(2)`).
+* **Firma Digital 🖋️:** Convierte tu palabra clave (`_secretKey`) en bytes y firma el token usando un algoritmo simétrico (`SecurityAlgorithms.HmacSha256Signature`). Esto garantiza que nadie pueda alterar el token sin conocer la clave secreta del servidor.
 
 
+* **5. Emisión y Respuesta 🎉:** El `JwtSecurityTokenHandler` crea el objeto del token y luego `handlerToken.WriteToken(token)` lo convierte en la cadena de texto compacta (separada por tres puntos) que el cliente guardará para sus futuras peticiones.
 
+---
+
+## 🗺️ Infografía del Flujo de Login
+Para ayudarte a recordar visualmente el orden de las operaciones, puedes seguir este mapa conceptual del método:
+```
+[Cliente envía LoginDto] 
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ 1. ¿El Username tiene texto válido?    │ ❌ No ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Sí
+       ▼
+┌────────────────────────────────────────┐
+│ 2. Buscar usuario en Base de Datos     │ ❌ No existe ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Existe usuario
+       ▼
+┌────────────────────────────────────────┐
+│ 3. Verificar Password con BCrypt       │ ❌ No coincide ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Contraseña Correcta
+       ▼
+┌────────────────────────────────────────┐
+│ 4. Configurar Descriptor de JWT        │ ⚙️ Agrega Claims (ID, Rol) y
+└────────────────────────────────────────┘    tiempo de expiración.
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ 5. Firmar, Generar y Escribir Token    │ 🔑 Usa la clave secreta
+└────────────────────────────────────────┘
+       │
+       ▼
+[Retorna Respuesta Exitosa con JWT y Datos]
+```
+
+---
 
 
 
