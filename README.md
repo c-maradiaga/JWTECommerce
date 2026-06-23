@@ -182,6 +182,41 @@ Expandir todos los métodos (Unfold All): Presiona Ctrl + K y luego Ctrl + J en 
 Colapsar o expandir solo el bloque actual: Presiona Ctrl + Shift + [ para cerrar el bloque donde está tu cursor, o Ctrl + Shift + ] para volverlo a abrir.
 ```
 
+### Instalando BCrypt para encriptar las claves de los usuarios:
+Package: https://www.nuget.org/packages/BCrypt.Net-Next/ 
+```
+namespace MyDotNetProject;
+
+using BCryptNet;
+
+// Hash a password
+string passwordHash =  BCrypt.HashPassword("my password");
+
+// Verify a password
+if(BCrypt.Verify("my password", passwordHash))
+{
+    // Password is correct
+}
+```
+
+### Introduccion a JWT
+JWT Debugger: https://www.jwt.io/
+JWT es un standar abierto para transmitir informacion.
+*  Maneja autenticación y Autorización
+*  Es autocontenible (El token tiene todo lo necesario para la identificacion de su contenido)
+*  Se puede firmar y cifrar
+
+Estructura de un JWT:
+   *  El Header (Tipo de token y algoritmo de firma como SHA256, HMAC, etc.)
+   *  Payload (Contiene los claims o datos, como el Id de usuario, nombre, roles, etc.)
+   *  Signature (Firma digital a partir del header, payload y una clave secreta)
+
+
+
+
+
+
+
 
 
 ## License
