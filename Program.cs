@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //? Registrando la D.I. (Interfaz y su respectivo Repositorio)
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //builder.Services.AddAutoMapper(typeof(Program).Assembly); //! asi se define la v14, porque de la v15 en adelante se necesita un Licence key.
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
