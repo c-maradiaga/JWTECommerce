@@ -274,8 +274,30 @@ Para ayudarte a recordar visualmente el orden de las operaciones, puedes seguir 
 ```
 
 ---
+### CORS
 
+Cross-Origin Resurce Sharing para asegurarse de que la API pueda ser consumida desde otras aplicacions o dominios.
+* Permite o restring las solicitudes HTTP entre sitios web de diferentes origenes.
+* Por defect, los navegadores bloquean las solicitudes cross-origin.
+* Se aplica principalmente en llamadas a APIs desde clientes Web
 
+CORS entra en acción en el navegador, no en el servidor ni en el ciente directamente.
+
+¿Cómo habilitar CORS en una API?
+* Se configura en el servidor para permitir solicitudes desde orígenes específicos.
+* Se puede aplicar globalmente o por controlador.
+
+```
+builder.Services.AddCors(options => 
+{
+       options.AddPolicy("AllowFrontend",
+                         policy => policy.WithOrigins("http://otrohost:4000")
+                                         .AllowAnyMethod()
+                                         .AllowAnyHeader());
+});
+
+app.UserCors("AllowFrontEnd");
+```
 
 
 ## License

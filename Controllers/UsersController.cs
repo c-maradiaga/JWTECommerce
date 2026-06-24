@@ -29,7 +29,6 @@ namespace JWTECommerce.Controllers
             return Ok(usersDto);
         }
 
-
         [HttpGet("{id:int}", Name = "GetUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -68,6 +67,23 @@ namespace JWTECommerce.Controllers
 
             return CreatedAtRoute("GetUser", new { id = result.Id }, result);
         }
+
+        [HttpPost("Login", Name = "LoginUser")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> LoginUser([FromBody] UserLoginDto userLoginDto)
+        {
+            if (userLoginDto is null || !ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userRepository.Login(userLoginDto);
+            if (user is null)
+                return Unauthorized();
+
+            return Ok(user);
+        }
+
 
 
 
