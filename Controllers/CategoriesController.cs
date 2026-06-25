@@ -1,13 +1,17 @@
 using AutoMapper;
+using JWTECommerce.Constants;
 using JWTECommerce.Models;
 using JWTECommerce.Models.Dtos;
 using JWTECommerce.Repository.IRepository;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWTECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+//! [EnableCors("AllowSpecificOrigin")]
+// [EnableCors(PolicyNames.AllowSpecificOrigin)]
 public class CategoriesController : ControllerBase
 {
     private readonly ICategoryRepository _categoryRepository;
@@ -22,6 +26,8 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    /// [EnableCors("AllowSpecificOrigin")]
+    /// [EnableCors(PolicyNames.AllowSpecificOrigin)]
     public IActionResult GetCategories()
     {
         var categories = _categoryRepository.GetCategories();

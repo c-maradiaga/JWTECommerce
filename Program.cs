@@ -1,4 +1,5 @@
 using AutoMapper;
+using JWTECommerce.Constants;
 using JWTECommerce.Data;
 using JWTECommerce.Repository;
 using JWTECommerce.Repository.IRepository;
@@ -27,6 +28,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//? Agregando CORS:
+builder.Services.AddCors(options =>
+{
+   options.AddPolicy("AllowSpecificOrigin", 
+    builder =>
+    {
+        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    }) ;
+
+});
 
 var app = builder.Build();
 
@@ -51,6 +62,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseHttpsRedirection();
+
+//! Definiendo que se va a utilizar las politica de CORS:
+//app.UseCors("AllowSpecificOrigin");
+app.UseCors(PolicyNames.AllowSpecificOrigin);
 
 app.UseAuthorization();
 

@@ -298,6 +298,22 @@ builder.Services.AddCors(options =>
 
 app.UserCors("AllowFrontEnd");
 ```
+La politica se puede colocar a nivel de cada Controller o a nivel de cada metodo.
+Para evitar tener que colocarlo en cada metodo o Controller, se define una constante. Para esto se creo
+la carpeta Constants y se creo una clase static para definir las constantes:
+```
+namespace JWTECommerce.Constants;
+
+public static class PolicyNames
+{
+    public const string AllowSpecificOrigin = "AllowSpecificOrigin";
+}
+```
+y para utilizarla seria:
+```
+app.UseCors(PolicyNames.AllowSpecifiOrigin);
+```
+
 
 
 ## License
