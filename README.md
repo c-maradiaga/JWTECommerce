@@ -314,6 +314,31 @@ y para utilizarla seria:
 app.UseCors(PolicyNames.AllowSpecifiOrigin);
 ```
 
+### Protegiendo Enpoints:
+En el CategoriesContoller se coloco el atibute Authorize
+```
+[Authorize]
+public class CategoriesController : ControllerBase
+````
+Al ejecutar cualquier enpoint del Categories controller aparece este mensaje:
+System.InvalidOperationException: No authenticationScheme was specified, and there was no DefaultChallengeScheme found.
+
+Por lo que se debe configuar en Program.cs el servicio de autenticacion, pero antes instalar el paquete
+Microsoft.AspNetCore.Authentication.JwtBearer
+
+### Enpoints Publicos y Privados:
+En program.cs agregar el middleware de autorizacion: antes del app.UseAuthorization()
+```
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
+
+
+
+
+
+
 
 
 ## License

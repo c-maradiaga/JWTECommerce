@@ -1,10 +1,14 @@
-using AutoMapper;
+using System.Text;
 using JWTECommerce.Constants;
 using JWTECommerce.Data;
 using JWTECommerce.Repository;
 using JWTECommerce.Repository.IRepository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +25,31 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //? la opción para usar la v15 es: builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//* Agregando el servicio de Autenticación JWT:
+// trayendo la secret key:
+var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
+if (string.IsNullOrWhiteSpace(secretKey))
+    throw new InvalidConfigurationException("El Secret Key No está configurado aún.");
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;   // el JwtBearerDefautl se debe instalar el paquete JwtBear
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer("Bearer", options =>
+{
+    options.RequireHttpsMetadata = true; // --> esto en Preproducción puede ir en false
+    options.SaveToken = true; // --> guarda el token en el contexto de ejecución
+    options.Authority = "https://localhost:44395/"; //? URL del IdentityServer
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ValidateIssuer = true, // --> En pre-producción puede ir en true, pero se debe configurar el Issuer en el IdentityServer
+        ValidateAudience = true
+    };
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -31,11 +60,11 @@ builder.Services.AddSwaggerGen();
 //? Agregando CORS:
 builder.Services.AddCors(options =>
 {
-   options.AddPolicy("AllowSpecificOrigin", 
-    builder =>
-    {
-        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-    }) ;
+    options.AddPolicy("AllowSpecificOrigin",
+     builder =>
+     {
+         builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+     });
 
 });
 
@@ -67,6 +96,7 @@ app.UseHttpsRedirection();
 //app.UseCors("AllowSpecificOrigin");
 app.UseCors(PolicyNames.AllowSpecificOrigin);
 
+app.UseAuthentication(); // Agregando el middleware de Autenticación, para que se pueda validar el token en cada request. Se debe agregar antes de UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();

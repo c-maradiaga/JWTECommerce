@@ -1,12 +1,14 @@
 using AutoMapper;
 using JWTECommerce.Models.Dtos;
 using JWTECommerce.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWTECommerce.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
@@ -50,6 +52,7 @@ namespace JWTECommerce.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto createUserDto)
         {
             if (createUserDto is null || !ModelState.IsValid)
@@ -72,6 +75,7 @@ namespace JWTECommerce.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginUser([FromBody] UserLoginDto userLoginDto)
         {
             if (userLoginDto is null || !ModelState.IsValid)
