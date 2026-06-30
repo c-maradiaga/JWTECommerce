@@ -1,0 +1,210 @@
+{
+  "info": {
+    "_postman_id": "aef0ebbf-b0e0-4189-971d-b91112aeaa93",
+    "name": "JWTDev",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "6725359"
+  },
+  "item": [
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Listado-Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5062/api/Categories",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener-Categoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5062/api/Categories/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear-Categoria",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Tecnología\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5062/api/Categories/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Categories",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Borrar-Categoria",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5062/api/Categories/15",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Categories",
+                "15"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar-Categoria",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\" : \"Probando\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5062/api/Categories/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Creacion-Usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"Devi200\",\r\n  \"name\": \"Irma Argelia\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"Admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5062/api/Users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-Usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"Devi200\",\r\n  \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5062/api/Users/Login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5062",
+              "path": [
+                "api",
+                "Users",
+                "Login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

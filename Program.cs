@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,8 +46,8 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ValidateIssuer = true, // --> En pre-producción puede ir en true, pero se debe configurar el Issuer en el IdentityServer
-        ValidateAudience = true
+        ValidateIssuer = false, // --> En pre-producción puede ir en true, pero se debe configurar el Issuer en el IdentityServer
+        ValidateAudience = false
     };
 });
 
@@ -55,7 +56,38 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //? Se quito para usar Swagger: builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+//* Agregando autenticación en Swagger:
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "JWTECommerce API",
+        Version = "v1",
+        Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
+            new List<string>()
+        }
+    });
+});
+
+
+
 
 //? Agregando CORS:
 builder.Services.AddCors(options =>
@@ -77,20 +109,17 @@ var app = builder.Build();
 //     app.MapOpenApi();
 //     app.MapScalarApiReference();
 // }
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "JWTECommerce API v1");
+});
 
 // Solo redirige a HTTPS si NO estamos en desarrollo
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-app.UseHttpsRedirection();
 
 //! Definiendo que se va a utilizar las politica de CORS:
 //app.UseCors("AllowSpecificOrigin");

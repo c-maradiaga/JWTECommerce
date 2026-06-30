@@ -332,6 +332,37 @@ En program.cs agregar el middleware de autorizacion: antes del app.UseAuthorizat
 app.UseAuthentication();
 app.UseAuthorization();
 ```
+### Incorporar Autenticación en Swagger:
+En program.cs, luego de builder.Services.AddSwaggerGen();
+```
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "JWTECommerce API",
+        Version = "v1",
+        Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
+            new List<string>()
+        }
+    });
+});
+```
 
 
 
