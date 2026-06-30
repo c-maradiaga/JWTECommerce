@@ -5,8 +5,6 @@ using JWTECommerce.Repository;
 using JWTECommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -85,7 +83,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
 
 
 
