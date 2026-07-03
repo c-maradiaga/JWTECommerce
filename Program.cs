@@ -55,44 +55,33 @@ builder.Services.AddControllers();
 //? Se quito para usar Swagger: builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
-
 //* Agregando autenticación en Swagger:
-// Configuración avanzada de Swagger para soportar JWT Authentication
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Tu API de Fintech/Préstamos", 
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "JWTECommerce API",
         Version = "v1",
-        Description = "Web API con autenticación JWT Bearer"
+        Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
     });
 
-    // Definir el esquema de seguridad JWT
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Introduce el token JWT en este formato: Bearer {tu_token_aquí}"
+        Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
     });
 
-    // Hacer que Swagger requiera el token globalmente o en los endpoints con [Authorize]
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-{
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
         {
-            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-            {
-                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        },
-        Array.Empty<string>()
-    }
-});
+            new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
+            new List<string>()
+        }
+    });
 });
 
 
