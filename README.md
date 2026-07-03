@@ -323,62 +323,7 @@ y para utilizarla seria:
 ```
 app.UseCors(PolicyNames.AllowSpecifiOrigin);
 ```
-
-### Protegiendo Enpoints:
-En el CategoriesContoller se coloco el atibute Authorize
-```
-[Authorize]
-public class CategoriesController : ControllerBase
-````
-Al ejecutar cualquier enpoint del Categories controller aparece este mensaje:
-System.InvalidOperationException: No authenticationScheme was specified, and there was no DefaultChallengeScheme found.
-
-Por lo que se debe configuar en Program.cs el servicio de autenticacion, pero antes instalar el paquete
-Microsoft.AspNetCore.Authentication.JwtBearer
-
-### Enpoints Publicos y Privados:
-En program.cs agregar el middleware de autorizacion: antes del app.UseAuthorization()
-```
-app.UseAuthentication();
-app.UseAuthorization();
-```
-### Incorporar Autenticación en Swagger:
-En program.cs, luego de builder.Services.AddSwaggerGen();
-```
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "JWTECommerce API",
-        Version = "v1",
-        Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
-    });
-
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
-    });
-
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
-            new List<string>()
-        }
-    });
-});
-```
-
-
-
-
-
-
+### Autorizacion
 
 >>>>>>> 774edbb6912bbba4dbc8a6ecf8f3852bf55ca487
 
