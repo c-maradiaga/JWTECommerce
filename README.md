@@ -120,7 +120,7 @@ Convertir de Category a CategoryDto y de Category a CreateCategoryDto.
 Se usa la version de automapper 14.0.0. ya que a partir de la v15, se necesita una licencia
 y la declaracion en Program.cs cambia
 
-## Configurando Docker-Compose aislado de otros proyectos 
+## Configurando Docker-Compose aislado de otros proyectos dir
 Con esto podríamos tener varios proyectos corriendo simultáneamente, cada uno con su propia
 instancia de SQL Server
 
@@ -179,6 +179,7 @@ docker cp ./ruta/en/tu/repo/tu_backup.bak nombre_contenedor:/var/opt/mssql/data/
 docker cp E:/CSharpTesting/JWTECommerce/JWTECommerce.bak sqlserver2022:/var/opt/mssql/data/
 ```
 
+<<<<<<< HEAD
 2. Ejecutar el comando de Restore:
 ```
 --Usando la herramienta mssql-tools18 (versión 18) versión recomendada:
@@ -190,6 +191,196 @@ docker exec -it sqlserver2022 /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 Usando la version anterior de la herramienta mssql-tools
 docker exec -it sqlserver2022 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "Pass123*" -C -Q "RESTORE DATABASE JWTECommerce FROM DISK = '/var/opt/mssql/data/JWTECommerce.bak' WITH REPLACE;"   
 ```
+=======
+### Instalando BCrypt para encriptar las claves de los usuarios:
+Package: https://www.nuget.org/packages/BCrypt.Net-Next/ 
+```
+namespace MyDotNetProject;
+
+using BCryptNet;
+
+// Hash a password
+string passwordHash =  BCrypt.HashPassword("my password");
+
+// Verify a password
+if(BCrypt.Verify("my password", passwordHash))
+{
+    // Password is correct
+}
+```
+
+### Introduccion a JWT
+JWT Debugger: https://www.jwt.io/
+JWT es un standar abierto para transmitir informacion.
+*  Maneja autenticación y Autorización
+*  Es autocontenible (El token tiene todo lo necesario para la identificacion de su contenido)
+*  Se puede firmar y cifrar
+
+Estructura de un JWT:
+   *  El Header (Tipo de token y algoritmo de firma como SHA256, HMAC, etc.)
+   *  Payload (Contiene los claims o datos, como el Id de usuario, nombre, roles, etc.)
+   *  Signature (Firma digital a partir del header, payload y una clave secreta)
+
+
+Analizaremos el proceso dividiéndolo en sus dos grandes fases: **Validación de Credenciales** y **Generación del JWT**.
+---
+
+## 🛠️ Fase 1: Validación de Credenciales
+
+En los primeros tres bloques del código, el sistema actúa como un filtro de seguridad para asegurarse de que el usuario es quien dice ser antes de entregarle una "llave" (el token).
+
+* **1. Validación Inicial 🛑:** Comprueba que el `Username` no viaje vacío o con espacios en blanco usando `string.IsNullOrWhiteSpace`. Si falla, corta el flujo inmediatamente devolviendo un DTO con el mensaje de error.
+* **2. Búsqueda en Base de Datos 🔍:** Busca al usuario utilizando Entity Framework (`_db.Users.FirstOrDefaultAsync`). Nota cómo usa `.ToLower().Trim()` en ambos lados para evitar problemas con mayúsculas o espacios accidentales. Si no existe, frena el proceso.
+* **3. Verificación de la Contraseña 🔐:** Las contraseñas nunca deben guardarse en texto plano. Aquí se usa la librería **BCrypt** (`BCrypt.Verify`) para comparar la contraseña que envía el cliente con el hash seguro que está guardado en la base de datos. Si no coinciden, se rechaza el acceso.
+
+---
+
+## 🎟️ Fase 2: Creación del JWT (JSON Web Token)
+
+Una vez que sabemos que el usuario es válido, el código prepara y firma el token digital.
+
+* **4. Configuración del Token 📝:** Aquí se define la estructura del token usando un `SecurityTokenDescriptor`:
+* **Claims (Demandas) 👤:** Son los datos de identidad que viajarán *dentro* del token (ID, nombre de usuario y su rol).
+* **Expiración ⏳:** Se define que el token será válido solo durante las próximas 2 horas (`DateTime.UtcNow.AddHours(2)`).
+* **Firma Digital 🖋️:** Convierte tu palabra clave (`_secretKey`) en bytes y firma el token usando un algoritmo simétrico (`SecurityAlgorithms.HmacSha256Signature`). Esto garantiza que nadie pueda alterar el token sin conocer la clave secreta del servidor.
+
+
+* **5. Emisión y Respuesta 🎉:** El `JwtSecurityTokenHandler` crea el objeto del token y luego `handlerToken.WriteToken(token)` lo convierte en la cadena de texto compacta (separada por tres puntos) que el cliente guardará para sus futuras peticiones.
+
+---
+
+## 🗺️ Infografía del Flujo de Login
+Para ayudarte a recordar visualmente el orden de las operaciones, puedes seguir este mapa conceptual del método:
+```
+[Cliente envía LoginDto] 
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ 1. ¿El Username tiene texto válido?    │ ❌ No ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Sí
+       ▼
+┌────────────────────────────────────────┐
+│ 2. Buscar usuario en Base de Datos     │ ❌ No existe ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Existe usuario
+       ▼
+┌────────────────────────────────────────┐
+│ 3. Verificar Password con BCrypt       │ ❌ No coincide ──► [Retorna Error]
+└────────────────────────────────────────┘
+       │ Contraseña Correcta
+       ▼
+┌────────────────────────────────────────┐
+│ 4. Configurar Descriptor de JWT        │ ⚙️ Agrega Claims (ID, Rol) y
+└────────────────────────────────────────┘    tiempo de expiración.
+       │
+       ▼
+┌────────────────────────────────────────┐
+│ 5. Firmar, Generar y Escribir Token    │ 🔑 Usa la clave secreta
+└────────────────────────────────────────┘
+       │
+       ▼
+[Retorna Respuesta Exitosa con JWT y Datos]
+```
+
+---
+### CORS
+
+Cross-Origin Resurce Sharing para asegurarse de que la API pueda ser consumida desde otras aplicacions o dominios.
+* Permite o restring las solicitudes HTTP entre sitios web de diferentes origenes.
+* Por defect, los navegadores bloquean las solicitudes cross-origin.
+* Se aplica principalmente en llamadas a APIs desde clientes Web
+
+CORS entra en acción en el navegador, no en el servidor ni en el ciente directamente.
+
+¿Cómo habilitar CORS en una API?
+* Se configura en el servidor para permitir solicitudes desde orígenes específicos.
+* Se puede aplicar globalmente o por controlador.
+
+```
+builder.Services.AddCors(options => 
+{
+       options.AddPolicy("AllowFrontend",
+                         policy => policy.WithOrigins("http://otrohost:4000")
+                                         .AllowAnyMethod()
+                                         .AllowAnyHeader());
+});
+
+app.UserCors("AllowFrontEnd");
+```
+La politica se puede colocar a nivel de cada Controller o a nivel de cada metodo.
+Para evitar tener que colocarlo en cada metodo o Controller, se define una constante. Para esto se creo
+la carpeta Constants y se creo una clase static para definir las constantes:
+```
+namespace JWTECommerce.Constants;
+
+public static class PolicyNames
+{
+    public const string AllowSpecificOrigin = "AllowSpecificOrigin";
+}
+```
+y para utilizarla seria:
+```
+app.UseCors(PolicyNames.AllowSpecifiOrigin);
+```
+
+### Protegiendo Enpoints:
+En el CategoriesContoller se coloco el atibute Authorize
+```
+[Authorize]
+public class CategoriesController : ControllerBase
+````
+Al ejecutar cualquier enpoint del Categories controller aparece este mensaje:
+System.InvalidOperationException: No authenticationScheme was specified, and there was no DefaultChallengeScheme found.
+
+Por lo que se debe configuar en Program.cs el servicio de autenticacion, pero antes instalar el paquete
+Microsoft.AspNetCore.Authentication.JwtBearer
+
+### Enpoints Publicos y Privados:
+En program.cs agregar el middleware de autorizacion: antes del app.UseAuthorization()
+```
+app.UseAuthentication();
+app.UseAuthorization();
+```
+### Incorporar Autenticación en Swagger:
+En program.cs, luego de builder.Services.AddSwaggerGen();
+```
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "JWTECommerce API",
+        Version = "v1",
+        Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
+            new List<string>()
+        }
+    });
+});
+```
+
+
+
+
+
+
+
+>>>>>>> 774edbb6912bbba4dbc8a6ecf8f3852bf55ca487
 
 
 ## License

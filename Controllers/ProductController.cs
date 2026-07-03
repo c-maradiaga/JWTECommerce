@@ -1,14 +1,15 @@
-using System.Net.Http.Headers;
 using AutoMapper;
 using JWTECommerce.Models;
 using JWTECommerce.Models.Dtos;
 using JWTECommerce.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWTECommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class ProductController : ControllerBase
 {
     private readonly IProductRepository _productRepository;
@@ -25,6 +26,7 @@ public class ProductController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public IActionResult GetProducts()
     {
         var products = _productRepository.GetProducts();
@@ -39,13 +41,13 @@ public class ProductController : ControllerBase
         return Ok(productsDto);
     }
 
-    // Obtener por Product Id
     [HttpGet("{productId:int}", Name = "GetProduct")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public IActionResult GetProduct(int productId)
     {
         if (productId <= 0)
@@ -58,45 +60,6 @@ public class ProductController : ControllerBase
         var productoDto = _mapper.Map<ProductDto>(product);
         return Ok(productoDto);
     }
-
-    // Obtener Producto por Category Id:
-    [HttpGet("searchByCategoryId/{categoryId:int}", Name = "GetProductsByCategoryId")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetProductsByCategoryId(int categoryId)
-    {
-        var lstProducts = _productRepository.GetProductForCategory(categoryId);
-        if (lstProducts.Count == 0)
-            return NotFound($"No existen productos con la categoria {categoryId}");
-
-        var lstProductDto = _mapper.Map<List<ProductDto>>(lstProducts);
-
-        return Ok(lstProductDto);
-    }
-
-
-    // Bucar Producto por Nombre o Descripcion del Producto: el {name:string} No lleva el tipo, solo los tipo int se les puede poner el tipo.
-    [HttpGet("searchProductByNameDesription/{nasearchTermme}", Name = "SearchProducts")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetProductForCategory(string searchTerm)
-    {
-        var lstProducts = _productRepository.SearchProduct(searchTerm);
-        if (lstProducts.Count == 0)
-            return NotFound($"No existen productos con el nombre o descripción {searchTerm}");
-
-        var lstProductsDto = _mapper.Map<List<ProductDto>>(lstProducts);
-        return Ok(lstProductsDto);
-    }
-
-
-
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -137,8 +100,86 @@ public class ProductController : ControllerBase
         return CreatedAtRoute("GetProduct", new { productId = product.Id }, productoDto);
     }
 
+    /* Comprar articulo: El Patch es solo porque este verbo se asemeja mas a la accion que se va a hacer,
+       pudo ser un Post. Un Get No porque no estamos obteniendo nada.*/
+    [HttpPatch("buyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult BuyProduct(string name, int quantity)
+    {
+        if (string.IsNullOrEmpty(name) || quantity <= 0)
+            return BadRequest("El nombre del producto o cantidad no son validos");
 
+        if (!_productRepository.ProductExists(name))
+            return BadRequest($"El producto {name} no existe.");
 
+        if (!_productRepository.BuyProduct(name, quantity))
+        {
+            ModelState.AddModelError("CustomError", $"No se pudo comprar el producto o la cantidad es mayor a la existencia.");
+            return BadRequest(ModelState);
+        }
+        var units = quantity == 1 ? "unidad" : "unidades";
+        return Ok($"Se compro {quantity} {units} del producto {name}");
+    }
 
+    [HttpPut("{productId:int}", Name = "UpdateProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult UpateProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+    {
+        if (updateProductDto == null)
+            return BadRequest(ModelState);
 
+        if (!_productRepository.ProductExists(productId))
+        {
+            return Problem(detail: "El producto No Existe", statusCode: StatusCodes.Status404NotFound, title: "Producto No Existe");
+            // ModelState.AddModelError("CustomError", "El producto no existe");
+            // return BadRequest(ModelState);
+        }
+
+        if (!_categoryRepository.CategoryExists(updateProductDto.CategoryId))
+        {
+            ModelState.AddModelError("CustomError", $"La categoria {updateProductDto.CategoryId} No existe");
+            return BadRequest(ModelState);
+        }
+
+        var product = _mapper.Map<Product>(updateProductDto);
+        product.Id = productId;
+
+        if (!_productRepository.UpdateProduct(product))
+        {
+            ModelState.AddModelError("CustomError", "Algo salio mal al actualizar el producto");
+            return StatusCode(500, ModelState);
+        }
+        return NoContent();
+    }
+
+    [HttpDelete("{productId:int}", Name = "DeleteProduct")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult DeleteProduct(int productId)
+    {
+        if (productId == 0)
+            return BadRequest(ModelState);
+
+        var product = _productRepository.GetProduct(productId);
+        if (product is null)
+            return NotFound($"El producto con id {productId} No Existe");
+
+        if (_productRepository.DeleteProduct(product))
+        {
+            ModelState.AddModelError("CustomError", $"Algo salio mal al eliminar el producto.");
+            return StatusCode(500, ModelState);
+        }
+
+        return NoContent();
+    }
 }

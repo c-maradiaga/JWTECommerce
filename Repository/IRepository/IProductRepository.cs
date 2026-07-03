@@ -17,4 +17,5 @@ public interface IProductRepository
     bool BuyProduct(string name, int quantity);
 
     bool Save();
+    bool DeleteProduct();
 }
