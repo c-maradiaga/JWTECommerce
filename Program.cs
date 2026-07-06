@@ -60,9 +60,9 @@ builder.Services.AddEndpointsApiExplorer();
 // Configuración avanzada de Swagger para soportar JWT Authentication
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Tu API de Fintech/Préstamos", 
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Tu API de Fintech/Préstamos",
         Version = "v1",
         Description = "Web API con autenticación JWT Bearer"
     });
@@ -78,21 +78,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Introduce el token JWT en este formato: Bearer {tu_token_aquí}"
     });
 
-    // Hacer que Swagger requiera el token globalmente o en los endpoints con [Authorize]
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-{
-    {
-        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        {
-            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-            {
-                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                Id = "Bearer"
-            }
-        },
-        Array.Empty<string>()
-    }
-});
+
 });
 
 
