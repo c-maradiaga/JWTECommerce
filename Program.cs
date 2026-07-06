@@ -77,8 +77,6 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Introduce el token JWT en este formato: Bearer {tu_token_aquí}"
     });
-
-
 });
 
 
