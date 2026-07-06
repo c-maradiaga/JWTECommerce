@@ -172,26 +172,16 @@ docker cp sqlserver2022:/var/opt/mssql/data/JWTECommerce.bak c:\Respaldos
 La ubicación del respaldo dentro del contenedor es /var/opt/mssql/data/JWTECommerce.bak
 (El directorio de destino debe existir previamente en la máquina física)
 
-## Realizando Restore de la Base de datos:
-1. Copiar el archivo .bak al contenedor:
-docker cp ./ruta/en/tu/repo/tu_backup.bak nombre_contenedor:/var/opt/mssql/data/
 ```
-docker cp E:/CSharpTesting/JWTECommerce/JWTECommerce.bak sqlserver2022:/var/opt/mssql/data/
+En Visual Studio Code, esta característica se conoce como Code Folding (Plegado de código) 📂. Las flechas en el margen izquierdo aparecen al pasar el cursor por encima, pero puedes controlar el estado de todos los métodos usando combinaciones de teclas ⌨️:
+
+Colapsar todos los métodos (Fold All): Presiona Ctrl + K y luego Ctrl + 0 (el número cero) en Windows/Linux, o Cmd + K y luego Cmd + 0 en Mac. Esto dejará todo tu archivo estructurado como en la captura.
+
+Expandir todos los métodos (Unfold All): Presiona Ctrl + K y luego Ctrl + J en Windows/Linux, o Cmd + K y luego Cmd + J en Mac.
+
+Colapsar o expandir solo el bloque actual: Presiona Ctrl + Shift + [ para cerrar el bloque donde está tu cursor, o Ctrl + Shift + ] para volverlo a abrir.
 ```
 
-<<<<<<< HEAD
-2. Ejecutar el comando de Restore:
-```
---Usando la herramienta mssql-tools18 (versión 18) versión recomendada:
-docker exec -it sqlserver2022 /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "Pass123**" -C -Q "RESTORE DATABASE JWTECommerce FROM DISK = '/var/opt/mssql/data/JWTECommerce.bak' WITH REPLACE;"
-```
-
- 
-```
-Usando la version anterior de la herramienta mssql-tools
-docker exec -it sqlserver2022 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "Pass123*" -C -Q "RESTORE DATABASE JWTECommerce FROM DISK = '/var/opt/mssql/data/JWTECommerce.bak' WITH REPLACE;"   
-```
-=======
 ### Instalando BCrypt para encriptar las claves de los usuarios:
 Package: https://www.nuget.org/packages/BCrypt.Net-Next/ 
 ```
@@ -325,7 +315,6 @@ app.UseCors(PolicyNames.AllowSpecifiOrigin);
 ```
 ### Autorizacion
 
->>>>>>> 774edbb6912bbba4dbc8a6ecf8f3852bf55ca487
 
 
 ## License
