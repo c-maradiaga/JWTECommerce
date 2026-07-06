@@ -316,6 +316,7 @@ app.UseCors(PolicyNames.AllowSpecifiOrigin);
 ### Autorizacion
 
 ### Uso de CACHE:
+--- Deberá ir después del UseCors
 Middleware de Caché de Respuestas:
        * .NET Core incluye Response Caching Middelware, que almacena y reuitliza respuestas HTTP
          según las cabeceras configuradas.
