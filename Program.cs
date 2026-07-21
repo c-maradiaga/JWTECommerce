@@ -54,7 +54,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //? Se quito para usar Swagger: builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen();
 
 //* Agregando autenticación en Swagger:
 // Configuración avanzada de Swagger para soportar JWT Authentication
