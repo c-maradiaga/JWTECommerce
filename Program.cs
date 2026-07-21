@@ -58,32 +58,26 @@ builder.Services.AddSwaggerGen();
 
 //* Agregando autenticación en Swagger:
 // Configuración avanzada de Swagger para soportar JWT Authentication
-// {
-//     options.SwaggerDoc("v1", new OpenApiInfo
-//     {
-//         Title = "JWTECommerce API",
-//         Version = "v1",
-//         Description = "API para gestión de productos, categorías y usuarios con autenticación JWT."
-//     });
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Tu API de Fintech/Préstamos",
+        Version = "v1",
+        Description = "Web API con autenticación JWT Bearer"
+    });
 
-//     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-//     {
-//         Name = "Authorization",
-//         Type = SecuritySchemeType.Http,
-//         Scheme = "bearer",
-//         BearerFormat = "JWT",
-//         In = ParameterLocation.Header,
-//         Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
-//     });
-
-//     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-//     {
-//         {
-//             new OpenApiSecuritySchemeReference("Bearer", document, "Bearer"),
-//             new List<string>()
-//         }
-//     });
-// });
+    // Definir el esquema de seguridad JWT
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Introduce el token JWT en este formato: Bearer {tu_token_aquí}"
+    });
+});
 
 
 
