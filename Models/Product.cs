@@ -9,7 +9,7 @@ public class Product
     public int Id { get; set; }
 
     [Required]
-    public string Name { get; set; }    = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     [Required]
     public string Descripcion { get; set; } = string.Empty;
@@ -25,18 +25,14 @@ public class Product
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
 
-    public DateTime CreationDate {get; set ;} = DateTime.Now;
+    public DateTime CreationDate { get; set; } = DateTime.Now;
 
-    public DateTime? UpdateDate {get;set;} = null;
+    public DateTime? UpdateDate { get; set; } = null;
 
     // Relacion con la tabla Category:
     [ForeignKey("CategoryId")]
     public int CategoryId { get; set; }
 
     // Navegacion:
-    public required Category Category {get;set;}
-
-
-
-
+    public required Category Category { get; set; }
 }

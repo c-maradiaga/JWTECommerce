@@ -333,8 +333,17 @@ en el Controller:
 [ResponseCache(Dureation = 10)]
 
 ```
+## Pasos para Desplegar en tu VPS:
+### Paso 2: Resumen del proceso de despliegue
+Para desplegar tu Web API sin exponer ni subir manualmente tu código al VPS, seguiremos estos pasos:
+1. Subir el código a un repositorio privado de GitHub: Tu código fuente permanece resguardado en Git.
+2. Conectar Coolify con GitHub: Le damos permiso a Coolify para leer el repositorio.
+3. Compilación aislada dentro de un contenedor en el VPS: El Dockerfile se encarga de compilar el código en una etapa temporal (build-env) y generar una imagen final que solo contiene los ejecutable compilados (.dll), desechando el código fuente.
+4. Ejecución de SQL Server y Web API: Coolify levantará tanto SQL Server como la API, aplicará las migraciones y ejecutará la aplicación.
 
-
+## Paso 3: Código e Instrucciones Paso a Paso
+### 1. Verificación del Dockerfile (Compilación Multi-Etapa)
+### 2. Preparar el proyecto con Git y GitHub
 
 
 

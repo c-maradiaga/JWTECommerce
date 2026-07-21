@@ -113,6 +113,29 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+
+//! Bloque de código para la migración e inicialización de datos al arrancar
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Aplica migraciones pendientes y crea la base de datos si no existe
+        context.Database.Migrate();
+
+        // Opcional: Aquí puedes llamar a tu método de inicialización de datos (Seeding)
+        // DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error al aplicar las migraciones a la base de datos.");
+    }
+}
+
+
 //! Definiendo que se va a utilizar las politica de CORS:
 //app.UseCors("AllowSpecificOrigin");
 app.UseCors(PolicyNames.AllowSpecificOrigin);

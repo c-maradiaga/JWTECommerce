@@ -1,16 +1,23 @@
-# Etapa 1: Compilación
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
+# ETAPA 1: Compilación (aquí se usa el código fuente de forma temporal)
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
+WORKDIR /app
 
-COPY *.csproj .
+# Copiar archivos de proyecto y restaurar dependencias
+COPY *.csproj ./
 RUN dotnet restore
 
-COPY . .
-RUN dotnet publish -c Release -o /app/publish
+# Copiar el resto del código y compilar la app
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-# Etapa 2: Imagen final, más liviana
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+# ETAPA 2: Imagen Final de Ejecución (¡NO contiene código fuente, solo DLLs!)
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
-COPY --from=build /app/publish .
 
-ENTRYPOINT ["dotnet", "JWTECommerce.dll"]
+# Copiamos únicamente los binarios compilados desde la etapa anterior
+COPY --from=build-env /app/out .
+
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+ENTRYPOINT ["dotnet", "JWTECommerce.API.dll"]

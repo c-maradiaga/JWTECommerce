@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   api:
     build:
@@ -5,21 +7,16 @@ services:
       dockerfile: Dockerfile
     container_name: jwtecommerce-api
     restart: always
+    ports:
+      - "5000:8080" # Mapeo de puerto local para probar la API
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerce;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
     networks:
-      - coolify
       - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.tuapp-api.rule=Host(`api.getfintech.online`)"
-      - "traefik.http.routers.tuapp-api.entrypoints=https"
-      - "traefik.http.routers.tuapp-api.tls=true"
-      - "traefik.http.routers.tuapp-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.tuapp-api.loadbalancer.server.port=8080"
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy # La API espera a que SQL Server esté totalmente listo
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -28,15 +25,21 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1433:1433" # Opcional: permite conectarte desde un cliente GUI local en Windows
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:
       - internal
-    # Nota: sin "ports:" — no se expone al público, solo la API la alcanza internamente
+    # El healthcheck verifica que SQL Server realmente acepte conexiones
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 networks:
-  coolify:
-    external: true
   internal:
     driver: bridge
 
