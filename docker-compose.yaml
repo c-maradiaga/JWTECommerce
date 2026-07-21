@@ -1,19 +1,75 @@
 services:
-  sqlserver2022:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver2022
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jwtecommerce-api
+    restart: always
     environment:
-      ACCEPT_EULA: 'Y'
-      MSSQL_SA_PASSWORD: 'Pass123**'
-      MSSQL_PID: 'Developer'
-    ports:
-      - "1434:1433"
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerce;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+    networks:
+      - coolify
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tuapp-api.rule=Host(`api.getfintech.online`)"
+      - "traefik.http.routers.tuapp-api.entrypoints=https"
+      - "traefik.http.routers.tuapp-api.tls=true"
+      - "traefik.http.routers.tuapp-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.tuapp-api.loadbalancer.server.port=8080"
+    depends_on:
+      - sqlserver
 
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tuapp-sqlserver
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
     volumes:
-      - jwt_ecommerce:/var/opt/mssql
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - internal
+    # Nota: sin "ports:" — no se expone al público, solo la API la alcanza internamente
+
+networks:
+  coolify:
+    external: true
+  internal:
+    driver: bridge
 
 volumes:
-  jwt_ecommerce:
+  sqlserver_data:
+
+    ##* PUNTOS CLAVE:
+    #? 1. La API se expone públicamente a través de Traefik, mientras que SQL Server solo es accesible internamente.
+    #? 2. La contraseña de SQL Server se gestiona mediante la variable de entorno SA_PASSWORD    
+    #? 3. loadbalancer.server.port=8080 → este es el puerto interno en que Kestrel escucha dentro del contenedor 
+    #    (por defecto en .NET 8+ es 8080 para HTTP cuando corre en contenedor Linux — lo confirmamos en el Paso 3).
+    #? 4. La red internal (privada, solo entre tu API y tu SQL Server) es distinta de coolify (donde vive Traefik) — 
+    #    así el SQL Server nunca es alcanzable desde fuera, ni siquiera por Traefik
+    #? 5. El networks: external: true en coolify le dice a Docker Compose "esta red ya existe, no la crees, solo únete a ella".
+
+
+
+    # services:
+    #   sqlserver2022:
+    #     image: mcr.microsoft.com/mssql/server:2022-latest
+    #     container_name: sqlserver2022
+    #     environment:
+    #       ACCEPT_EULA: 'Y'
+    #       MSSQL_SA_PASSWORD: 'Pass123**'
+    #       MSSQL_PID: 'Developer'
+    #     ports:
+    #       - "1434:1433"
+
+    #     volumes:
+    #       - jwt_ecommerce:/var/opt/mssql
+
+    # volumes:
+    #   jwt_ecommerce:
 
     #? Recordar tener Docker instalado y en ejecución para usar este archivo docker-compose.yaml.
     #? en el apartdo ports: 1434:1433, el puerto 1434 es el puerto del host (nuestro equipo) y el puerto 1433 es el puerto del contenedor (sqlserver2022). Esto significa que cuando accedamos a localhost:1434 en nuestro equipo, estaremos accediendo al puerto 1433 dentro del contenedor, donde se está ejecutando SQL Server.
