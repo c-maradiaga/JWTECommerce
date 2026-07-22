@@ -1,9 +1,14 @@
 services:
+  sqlserver-permissions:
+    image: busybox
+    command: [ "sh", "-c", "chown -R 10001:0 /var/opt/mssql/data && chmod -R 770 /var/opt/mssql/data" ]
+    volumes:
+      - sqlserver-data:/var/opt/mssql/data
+    user: "0:0"
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver-db
-    # Asignamos usuario root (0) para solucionar el error "Access is denied" en los volúmenes
-    ## user: "0:0"   NO FUNCIONA ya Desplegado.
     platform: linux/amd64
     environment:
       - ACCEPT_EULA=Y
@@ -12,6 +17,9 @@ services:
       - "1434:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql/data
+    depends_on:
+      sqlserver-permissions:
+        condition: service_completed_successfully
     healthcheck:
       test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$SA_PASSWORD' -C -Q 'SELECT 1' || exit 1" ]
       interval: 10s
