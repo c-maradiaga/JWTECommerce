@@ -1,50 +1,39 @@
-version: '3.8'
-
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver-db
+    # Asignamos usuario root (0) para solucionar el error "Access is denied" en los volúmenes
+    user: "0:0"
+    platform: linux/amd64
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '$SA_PASSWORD' -C -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: jwtecommerce-api
-    restart: always
+    container_name: web-api
     ports:
-      - "5000:8080" # Mapeo de puerto local para probar la API
+      - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerce;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
-    networks:
-      - internal
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerceDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
     depends_on:
       sqlserver:
-        condition: service_healthy # La API espera a que SQL Server esté totalmente listo
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: tuapp-sqlserver
-    restart: always
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD}
-    ports:
-      - "1433:1433" # Opcional: permite conectarte desde un cliente GUI local en Windows
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    networks:
-      - internal
-    # El healthcheck verifica que SQL Server realmente acepte conexiones
-    healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-
-networks:
-  internal:
-    driver: bridge
+        condition: service_healthy
 
 volumes:
-  sqlserver_data:
+  sqlserver-data:
 
     ##* PUNTOS CLAVE:
     #? 1. La API se expone públicamente a través de Traefik, mientras que SQL Server solo es accesible internamente.
@@ -54,8 +43,6 @@ volumes:
     #? 4. La red internal (privada, solo entre tu API y tu SQL Server) es distinta de coolify (donde vive Traefik) — 
     #    así el SQL Server nunca es alcanzable desde fuera, ni siquiera por Traefik
     #? 5. El networks: external: true en coolify le dice a Docker Compose "esta red ya existe, no la crees, solo únete a ella".
-
-
 
     # services:
     #   sqlserver2022:

@@ -53,7 +53,7 @@ public class ApplicationDbContext : DbContext
             },
             new Product
             {
-                Id = 1,
+                Id = 2,
                 Name = "Producto Inicial 1",
                 Descripcion = "Descripción del producto 1",
                 Price = 99.99m,
