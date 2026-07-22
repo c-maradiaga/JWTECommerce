@@ -3,7 +3,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver-db
     # Asignamos usuario root (0) para solucionar el error "Access is denied" en los volúmenes
-    user: "0:0"
+    ## user: "0:0"   NO FUNCIONA ya Desplegado.
     platform: linux/amd64
     environment:
       - ACCEPT_EULA=Y
