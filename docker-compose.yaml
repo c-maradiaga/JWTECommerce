@@ -38,7 +38,7 @@ services:
       dockerfile: Dockerfile
     container_name: web-api
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerceDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerceDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=False;
     depends_on:
       sqlserver:
         condition: service_healthy
