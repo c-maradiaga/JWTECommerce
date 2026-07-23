@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile
     container_name: web-api
     ports:
-      - "8080:8080"
+      - "8085:8080"
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerceDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
     depends_on:
