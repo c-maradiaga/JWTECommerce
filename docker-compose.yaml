@@ -40,6 +40,8 @@ services:
     ports:
       - "8081:8055" # Puerto_Externo:Puerto_Interno (8081 instancia del servidor/host (donde corre Coolify) 8055 instancia del contenedor (donde corre Kestrel))
     environment:
+      # Sobrescribimos la URL para forzar el puerto 8055 (Sin espacios alrededor de '=')
+      - ASPNETCORE_URLS=http://+:8055
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerce;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=True;
     depends_on:
       sqlserver:
