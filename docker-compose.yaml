@@ -1,11 +1,13 @@
 services:
   sqlserver-permissions:
     image: busybox
-    command: [ "sh", "-c", "chown -R 10001:0 /var/opt/mssql/data && chmod -R 770 /var/opt/mssql/data" ]
+    command: ["sh", "-c", "chown -R 10001:0 /var/opt/mssql/data && chmod -R 770 /var/opt/mssql/data"]
     volumes:
       - sqlserver-data:/var/opt/mssql/data
     user: "0:0"
     restart: "no"
+    networks:
+      - app-network
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -27,6 +29,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - app-network
 
   api:
     build:
@@ -38,9 +42,18 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+    networks:
+      - app-network
+      - coolify
 
 volumes:
   sqlserver-data:
+
+networks:
+  app-network:
+    driver: bridge
+  coolify:
+    external: true
 
     ##* PUNTOS CLAVE:
     #? 1. La API se expone públicamente a través de Traefik, mientras que SQL Server solo es accesible internamente.
