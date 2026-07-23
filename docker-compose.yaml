@@ -40,7 +40,7 @@ services:
     ports:
       - "8081:8055" # Puerto_Externo:Puerto_Interno (8081 instancia del servidor/host (donde corre Coolify) 8055 instancia del contenedor (donde corre Kestrel))
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerceDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=True;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=JWTECommerce;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=True;
     depends_on:
       sqlserver:
         condition: service_healthy
