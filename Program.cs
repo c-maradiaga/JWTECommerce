@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //? Add services to the container. Agregando los Services:
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("ConexionSQL")));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //? Registrando la D.I. (Interfaz y su respectivo Repositorio)
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -101,6 +102,49 @@ var app = builder.Build();
 //     app.MapOpenApi();
 //     app.MapScalarApiReference();
 // }
+
+// --- INICIO DE BLOQUE SEGURO DE MIGRACIONES ---
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     var logger = services.GetRequiredService<ILogger<Program>>();
+
+//     int maxRetries = 5;
+//     int delayInSeconds = 5;
+
+//     for (int retry = 1; retry <= maxRetries; retry++)
+//     {
+//         try
+//         {
+//             logger.LogInformation($"Intentando aplicar migraciones (Intento {retry} de {maxRetries})...");
+//             var dbContext = services.GetRequiredService<ApplicationDbContext>();
+//             dbContext.Database.Migrate();
+//             logger.LogInformation("¡Migraciones aplicadas con éxito!");
+//             break; // Si se aplicó correctamente, sale del bucle
+//         }
+//         catch (SqlException ex)
+//         {
+//             logger.LogWarning($"No se pudo conectar a SQL Server en el intento {retry}: {ex.Message}");
+//             if (retry == maxRetries)
+//             {
+//                 logger.LogError(ex, "Ocurrió un error crítico al aplicar las migraciones tras varios intentos.");
+//             }
+//             else
+//             {
+//                 Thread.Sleep(TimeSpan.FromSeconds(delayInSeconds));
+//             }
+//         }
+//         catch (Exception ex)
+//         {
+//             logger.LogError(ex, "Ocurrió un error inesperado al aplicar las migraciones.");
+//             break;
+//         }
+//     }
+// }
+// --- FIN DE BLOQUE SEGURO DE MIGRACIONES ---
+
+
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
